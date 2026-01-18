@@ -13,7 +13,7 @@ Todo — это десктопное приложение для управле�
 Установка
 1. Склонируйте репозиторий:
    
-   git clone https://github.com/your-username/notemanager.git
+   https://github.com/Focus-007/Information-systems-code-development.git
   
 2. Сборка:
    - Откройте файл решения .sln в Visual Studio.
