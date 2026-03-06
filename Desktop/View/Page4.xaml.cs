@@ -16,185 +16,199 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace Desktop
 {
-    /// <summary>
-    /// Логика взаимодействия для Window4.xaml
-    /// </summary>
     public partial class Window4 : Window
     {
-
         private List<CheckBox> activeTasks = new List<CheckBox>();
         private List<CheckBox> historyTasks = new List<CheckBox>();
         private bool isHistoryMode = false;
+        private string currentFilterCategory = null;
+
         public Window4()
         {
             InitializeComponent();
+            RefreshTaskList();
         }
 
-
-        public void AddCheckBox(string name, string comment)
+        public void AddCheckBox(string name, string comment, string category, DateTime date)
         {
-            var cb = new CheckBox { Content = name, Tag = comment };
-
-            cb.IsThreeState = false;
+            CheckBox cb = new CheckBox();
+            // Сохраняем имя отдельно в Tag, чтобы не терять его при перечеркивании
+            cb.Tag = new { Name = name, Comment = comment, Category = category, Date = date };
+            cb.Content = name;
 
             cb.Checked += (s, e) => ShowInfo(cb);
             cb.Unchecked += (s, e) => ShowInfo(cb);
 
             activeTasks.Add(cb);
-
             RefreshTaskList();
         }
 
         private void RefreshTaskList()
         {
             list.Items.Clear();
-            if (isHistoryMode)
+            List<CheckBox> sourceList = isHistoryMode ? historyTasks : activeTasks;
+
+            foreach (var cb in sourceList)
             {
-                foreach (var cb in historyTasks)
+                var tagData = cb.Tag as dynamic;
+                if (currentFilterCategory == null || tagData.Category == currentFilterCategory)
                 {
+                    // Настройка внешнего вида CheckBox в списке
+                    if (isHistoryMode)
+                    {
+                        cb.Foreground = Brushes.Gray;
+                        // Создаем текстовый блок с перечеркиванием для содержимого CheckBox
+                        cb.Content = new TextBlock
+                        {
+                            Text = tagData.Name,
+                            TextDecorations = TextDecorations.Strikethrough
+                        };
+                    }
+                    else
+                    {
+                        cb.Foreground = Brushes.Black;
+                        cb.Content = tagData.Name;
+                    }
+
                     list.Items.Add(cb);
                 }
+            }
+            UpdateDisplayDefaults();
+        }
+
+        private void UpdateDisplayDefaults()
+        {
+            labZag.Text = isHistoryMode ? "История" : "Задачи"; // labZag теперь TextBlock
+            if (currentFilterCategory != null) labZag.Text = currentFilterCategory;
+
+            // Сброс стилей заголовка по умолчанию
+            labZag.Foreground = Brushes.Black;
+            labZag.TextDecorations = null;
+
+            bloc1.Text = "";
+            bloc1.Foreground = Brushes.Black;
+            bloc1.TextDecorations = null;
+
+            bloc2.Text = "";
+            bloc2.Foreground = Brushes.Black;
+            bloc2.TextDecorations = null;
+
+            btnGotovo.IsEnabled = false;
+            btnUdlTask.IsEnabled = false;
+        }
+
+        private void SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (list.SelectedItem is CheckBox cb)
+            {
+                ShowInfo(cb);
+                btnUdlTask.IsEnabled = true;
+                btnGotovo.IsEnabled = true;
             }
             else
             {
-                foreach (var cb in activeTasks)
-                {
-                    list.Items.Add(cb);
-                }
+                UpdateDisplayDefaults();
             }
-        }
-
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-  
-        }
-        private void list_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (list.SelectedItem is CheckBox cb) ShowInfo(cb);
         }
 
         private void ShowInfo(CheckBox cb)
         {
-            bloc1.Text = cb.Content.ToString();
-            
-            if (cb.Content is TextBlock textBlock)
+            var tagData = cb.Tag as dynamic;
+            if (tagData != null)
             {
+                labZag.Text = tagData.Name;
+                bloc1.Text = tagData.Date.ToShortDateString();
+                bloc2.Text = tagData.Comment;
 
-                var run = textBlock.Inlines.FirstOrDefault() as Run;
-                if (run != null)
-                    bloc2.Text = cb.Tag?.ToString() ?? "";
-            }
-            else
-            {
-                bloc2.Text = cb.Tag?.ToString() ?? "";
-            }
-        }
-
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            Window3 f3 = new Window3();
-            f3.Show();
-
-            Hide();
-        }
-
-        private void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-            var selectedCheckBoxes = activeTasks
-                .Where(cb => cb.IsChecked == true)
-                .ToList();
-
-            if (selectedCheckBoxes.Count == 0)
-            {
-                MessageBox.Show("Выберите хотя бы одну задачу для завершения",
-                    "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            foreach (var cb in selectedCheckBoxes)
-            {
-                var textBlock = new TextBlock();
-                textBlock.Inlines.Add(new Run(cb.Content.ToString())
+                // Если мы в истории — делаем текст в правом окне серым и перечеркнутым
+                if (isHistoryMode)
                 {
-                    TextDecorations = TextDecorations.Strikethrough,
-                    Foreground = Brushes.Gray
-                });
+                    labZag.Foreground = Brushes.Gray;
+                    labZag.TextDecorations = TextDecorations.Strikethrough;
 
-                cb.Tag = cb.Tag ?? "";
-                cb.Content = textBlock;
-                cb.IsEnabled = false; 
+                    bloc1.Foreground = Brushes.Gray;
+                    bloc1.TextDecorations = TextDecorations.Strikethrough;
 
-                historyTasks.Add(cb);
-                activeTasks.Remove(cb);
+                    bloc2.Foreground = Brushes.Gray;
+                    bloc2.TextDecorations = TextDecorations.Strikethrough;
+                }
+                else
+                {
+                    labZag.Foreground = Brushes.Black;
+                    labZag.TextDecorations = null;
+
+                    bloc1.Foreground = Brushes.Black;
+                    bloc1.TextDecorations = null;
+
+                    bloc2.Foreground = Brushes.Black;
+                    bloc2.TextDecorations = null;
+                }
             }
+        }
 
-            if (!isHistoryMode)
+        private void Button_Click_Gotovo(object sender, RoutedEventArgs e)
+        {
+            if (list.SelectedItem is CheckBox cb)
             {
+                if (!isHistoryMode)
+                {
+                    cb.IsChecked = true;
+                    activeTasks.Remove(cb);
+                    historyTasks.Add(cb);
+                }
                 RefreshTaskList();
             }
         }
 
-        private void Button_Click_2(object sender, RoutedEventArgs e)
+        private void Button_Click_DeleteSelectedTask(object sender, RoutedEventArgs e)
         {
-            var sourceCollection = isHistoryMode ? historyTasks : activeTasks;
-            var checkboxesToDelete = sourceCollection
-                .Where(cb => cb.IsChecked == true)
-                .ToList();
-
-            if (checkboxesToDelete.Count == 0)
+            if (list.SelectedItem is CheckBox cb)
             {
-                MessageBox.Show("Поставьте галочки на чекбоксах, которые хотите удалить",
-                    "Внимание", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-
-            foreach (var cb in checkboxesToDelete)
-            {
-                sourceCollection.Remove(cb);
-            }
-            RefreshTaskList();
-
-            bloc1.Text = "";
-            bloc2.Text = "";
-        }
-
-        private void Button_Click_3(object sender, RoutedEventArgs e)
-        {
-            isHistoryMode = true;
-            RefreshTaskList();
-
-            if (sender is Button button)
-            {
-                button.Content = "Задачи";
-                button.Click -= Button_Click_3;
-                button.Click += Button_Click_4; 
+                if (isHistoryMode) historyTasks.Remove(cb);
+                else activeTasks.Remove(cb);
+                RefreshTaskList();
             }
         }
 
-        private void Button_Click_4(object sender, RoutedEventArgs e)
-        {
-
-            isHistoryMode = false;
-            RefreshTaskList();
-
-            if (sender is Button button)
-            {
-                button.Content = "История";
-                button.Click -= Button_Click_4;
-                button.Click += Button_Click_3; 
-            }
-        }
-        private void ShowTasks_Click(object sender, RoutedEventArgs e)
+        // Переключение режимов с скрытием/показом кнопок
+        private void Button_Click_Tasks(object sender, RoutedEventArgs e)
         {
             isHistoryMode = false;
+            currentFilterCategory = null;
+
+            // Показываем кнопки управления и создания
+            btnGotovo.Visibility = Visibility.Visible;
+            btnUdlTask.Visibility = Visibility.Visible;
+
             RefreshTaskList();
         }
 
-        private void ShowHistory_Click(object sender, RoutedEventArgs e)
+        private void Button_Click_History(object sender, RoutedEventArgs e)
         {
             isHistoryMode = true;
+            currentFilterCategory = null;
+
+            // Скрываем кнопки управления (они не нужны в истории по вашему запросу)
+            btnGotovo.Visibility = Visibility.Collapsed;
+            btnUdlTask.Visibility = Visibility.Collapsed;
+            // btnAdd.Visibility = Visibility.Collapsed;
+
             RefreshTaskList();
+        }
+
+        private void Button_Click_Category(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn)
+            {
+                currentFilterCategory = (currentFilterCategory == btn.Content.ToString()) ? null : btn.Content.ToString();
+                RefreshTaskList();
+            }
+        }
+
+        private void Button_Click_CreateTask(object sender, RoutedEventArgs e)
+        {
+            Window3 f3 = new Window3(this);
+            f3.Show();
         }
     }
 }

@@ -11,24 +11,26 @@
 
         <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="405" Margin="694,96,0,0" VerticalAlignment="Top" Width="275"/>
 
-        <ListBox x:Name="list" Margin="159,123,357,0" FontSize="20" SelectionChanged="list_SelectionChanged" FontFamily="Arial Nova" d:ItemsSource="{d:SampleData ItemCount=5}" IsSynchronizedWithCurrentItem="True"/>
+        <ListBox x:Name="list" Margin="159,123,357,0" FontSize="20" SelectionChanged="SelectionChanged" FontFamily="Arial Nova" d:ItemsSource="{d:SampleData ItemCount=5}" IsSynchronizedWithCurrentItem="True"/>
         <TextBlock x:Name="bloc1"   FontSize="18" Margin="707,192,41,325" FontFamily="Arial Nova"/>
         <TextBlock x:Name="bloc2" FontSize="18" Margin="707,274,41,239" TextWrapping="Wrap" FontFamily="Arial Nova"/>
-        <Button Style="{DynamicResource but4}" Margin="24,464,889,24" Click="Button_Click" Content="+" Background="#FFF96868" FontFamily="Arial Nova" BorderThickness="0,0,0,0" FontSize="36" Width="70" Height="70"/>
-        <Label Content="Загаловок" FontSize="36" Margin="743,108,0,398" HorizontalAlignment="Left" />
+        <Button Style="{DynamicResource but4}" Margin="24,464,889,24" Click="Button_Click_CreateTask" Content="+" Background="#FFF96868" FontFamily="Arial Nova" BorderThickness="0,0,0,0" FontSize="36" Width="70" Height="70"/>
         <Image Margin="16,16,889,469" Source="/Image3.png" Stretch="Fill" Width="95" Height="95"/>
 
-        <Button Style="{DynamicResource but5}" x:Name="btnTsk" Content="Задачи" Margin="10,159,0,0" Height="30" Width="108" Click="ShowTasks_Click" FontFamily="Arial Nova"/>
-        <Button Style="{DynamicResource but5}" x:Name="btnHstr" Content="История" Margin="10,204,0,0" Height="30" Width="108" Click="ShowHistory_Click" FontFamily="Arial Nova"/>
-        <Button Style="{DynamicResource but5}" Content="Дом"  Margin="160,76,0,0" Height="30" Width="76" Foreground="#FF6CC312" FontFamily="Arial Nova"/>
-        <Button Style="{DynamicResource but5}" Content="Работа"  Margin="260,76,0,0" Height="30" Width="76" Foreground="#FFEF5212" FontFamily="Arial Nova"/>
-        <Button Style="{DynamicResource but5}" Content="Учеба"  Margin="360,76,0,0" Height="30" Width="76" Foreground="#FF3E4EC3" FontFamily="Arial Nova"/>
-        <Button Style="{DynamicResource but5}" Content="Отдых"  Margin="460,76,0,0" Height="30" Width="76" Foreground="#FFBC0CCE" FontFamily="Arial Nova"/>
+        <Button Style="{DynamicResource but5}" x:Name="btnTsk" Content="Задачи" Margin="10,159,0,0" Height="30" Width="108" Click="Button_Click_Tasks" FontFamily="Arial Nova"/>
+        <Button Style="{DynamicResource but5}" x:Name="btnHstr" Content="История" Margin="10,204,0,0" Height="30" Width="108" Click="Button_Click_History" FontFamily="Arial Nova"/>
+        <Button x:Name="btn1" Style="{DynamicResource but5}" Content="Дом"  Margin="160,76,0,0" Height="30" Width="76" Foreground="#FF6CC312" FontFamily="Arial Nova" Click="Button_Click_Category"/>
+        <Button x:Name="btn2" Style="{DynamicResource but5}" Content="Работа"  Margin="260,76,0,0" Height="30" Width="76" Foreground="#FFEF5212" FontFamily="Arial Nova" Click="Button_Click_Category"/>
+        <Button x:Name="btn3" Style="{DynamicResource but5}" Content="Учеба"  Margin="360,76,0,0" Height="30" Width="76" Foreground="#FF3E4EC3" FontFamily="Arial Nova" Click="Button_Click_Category"/>
+        <Button x:Name="btn4" Style="{DynamicResource but5}" Content="Отдых"  Margin="460,76,0,0" Height="30" Width="76" Foreground="#FFBC0CCE" FontFamily="Arial Nova" Click="Button_Click_Category"/>
 
 
 
-        <Button Style="{DynamicResource but1}" Content="Удалить" HorizontalAlignment="Left" Margin="717,440,0,0" VerticalAlignment="Top" Height="48" Width="228" RenderTransformOrigin="0.016,0.756"  FontSize="24" Click="Button_Click_2" Background="#FFF96868" FontFamily="Arial Nova Light" BorderThickness="0,0,0,0" />
-        <Button Style="{DynamicResource but2}" Content="Готово" HorizontalAlignment="Left" Margin="715,382,0,0" VerticalAlignment="Top" Height="48" Width="228" FontSize="24" Click="Button_Click_1" Background="#FFF96868" FontFamily="Arial Nova Light" BorderThickness="0,0,0,0"/>
+
+
+        <Button x:Name="btnUdlTask" Style="{DynamicResource but1}" Content="Удалить" HorizontalAlignment="Left" Margin="717,440,0,0" VerticalAlignment="Top" Height="48" Width="228" RenderTransformOrigin="0.016,0.756"  FontSize="24" Click="Button_Click_DeleteSelectedTask" Background="#FFF96868" FontFamily="Arial Nova Light" BorderThickness="0,0,0,0" />
+        <Button x:Name="btnGotovo" Style="{DynamicResource but2}" Content="Готово" HorizontalAlignment="Left" Margin="715,382,0,0" VerticalAlignment="Top" Height="48" Width="228" FontSize="24" Click="Button_Click_Gotovo" Background="#FFF96868" FontFamily="Arial Nova Light" BorderThickness="0,0,0,0"/>
+        <TextBlock x:Name="labZag"   FontSize="18" Margin="707,111,41,406" FontFamily="Arial Nova"/>
 
     </Grid>
 </Window>

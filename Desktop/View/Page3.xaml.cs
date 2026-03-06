@@ -20,46 +20,67 @@ namespace Desktop
     /// </summary>
     public partial class Window3 : Window
     {
-        public Window3()
+        // Ссылка на Window4, чтобы мы могли добавлять задачи
+        private Window4 _mainWindow;
+
+        public Window3(Window4 mainWindow) // Передаем ссылку на Window4
         {
             InitializeComponent();
+            _mainWindow = mainWindow; // Сохраняем ссылку
+            InitializeCategories();
         }
 
-        private async void Button_Click(object sender, RoutedEventArgs e)
+        private void InitializeCategories()
         {
+            // Заполняем ComboBox comboKat
+            comboKat.ItemsSource = new List<string> { "Дом", "Работа", "Учеба", "Отдых" };
+            comboKat.SelectedIndex = 0; // Выбираем первый элемент по умолчанию
+            datePicker.SelectedDate = DateTime.Today; // Выбираем сегодняшнюю дату по умолчанию
+        }
 
+        private void Button_Click(object sender, RoutedEventArgs e) // Кнопка "Создать"
+        {
+            string taskName = text.Text;
+            string taskDescription = text2.Text;
+            string selectedCategory = comboKat.SelectedItem?.ToString(); // Получаем выбранную категорию
+            DateTime? selectedDate = datePicker.SelectedDate; // Получаем выбранную дату
 
-            if (string.IsNullOrWhiteSpace(text.Text))
+            if (string.IsNullOrWhiteSpace(taskName))
             {
-                MessageBox.Show("Введите название!", "Ошибка");
+                MessageBox.Show("Введите название задачи!", "Ошибка");
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(taskDescription))
+            {
+                MessageBox.Show("Введите описание задачи!", "Ошибка");
+                return;
+            }
+            if (selectedCategory == null)
+            {
+                MessageBox.Show("Выберите категорию!", "Ошибка");
+                return;
+            }
+            if (selectedDate == null)
+            {
+                MessageBox.Show("Выберите дату!", "Ошибка");
                 return;
             }
 
-            Window4 window4 = null;
-            foreach (Window w in Application.Current.Windows)
-                if (w is Window4) { window4 = w as Window4; break; }
+            // Передаем все данные в метод AddCheckBox Window4
+            _mainWindow.AddCheckBox(taskName, taskDescription, selectedCategory, selectedDate.Value);
 
-            if (window4 == null)
-            {
-                window4 = new Window4();
-            }
+            text.Text = "";
+            text2.Text = "";
+            comboKat.SelectedIndex = 0;
+            datePicker.SelectedDate = DateTime.Today; // Сбрасываем на сегодня или null
 
-            window4.Show();
-
-            window4.AddCheckBox(text.Text, text2.Text);
-
-            text.Text = text2.Text = "";
-            text.Focus();
-
-            window4.Show();
+            // Если Window3 должно закрываться после создания
             this.Close();
         }
 
-        private async void Button_Click_2(object sender, RoutedEventArgs e)
+        private void Button_Click_2(object sender, RoutedEventArgs e) // Кнопка "Отмена"
         {
-
-            Close();
+            this.Close();
         }
     }
-    
 }
